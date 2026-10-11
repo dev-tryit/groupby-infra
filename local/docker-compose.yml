@@ -1,0 +1,31 @@
+# 로컬 구성 (08_infra/infra.md 4장). 이 레포의 루트에서 실행한다.
+#   docker compose -f docs/13_code/infra/local/docker-compose.yml up --build
+services:
+  client:
+    build: ../../backend
+    command: python -m groupby.client --data /data/client --outbox /data/submissions collect 54762507 55240017
+    env_file:
+      - path: ../../../../.env
+        required: false
+    volumes:
+      - ./data/client:/data/client
+      - ./data/submissions:/data/submissions
+
+  server:
+    build: ../../backend
+    command: >
+      python -m groupby.server --inbox /data/submissions --data /data/server
+      serve --resumes /resumes --static /frontend --host 0.0.0.0 --port 8000
+    env_file:
+      - path: ../../../../.env
+        required: false
+    volumes:
+      - ./data/submissions:/data/submissions:ro
+      - ./data/server:/data/server
+      - ../../../12_test-scenario/golden-set:/resumes:ro
+      - ../../frontend:/frontend:ro
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      client:
+        condition: service_completed_successfully

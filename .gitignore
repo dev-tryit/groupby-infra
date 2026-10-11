@@ -1,3 +1,8 @@
-local/data/
+# 실행하며 만든 데이터는 올리지 않는다. 특징과 비교의 결과만 올린다 (08_infra/infra.md 6.1).
+local/data/*
+!local/data/server/
+local/data/server/*
+!local/data/server/features/
+!local/data/server/matches/
 .env
 .env.*
